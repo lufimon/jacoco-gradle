@@ -4,7 +4,7 @@ jacoco {
     toolVersion = "0.8.1"
 }
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest','testReleaseUnitTest','createDebugCoverageReport','createReleaseCoverageReport']) { //we use "debug" build type for test coverage (can be other)
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testUatDebugUnitTest','createUatDebugCoverageReport']) { //we use "debug" build type for test coverage (can be other)
     group = "reporting"
     description = "Generate unified Jacoco code coverage report"
 
