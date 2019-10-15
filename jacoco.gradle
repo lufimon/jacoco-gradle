@@ -71,8 +71,6 @@ project.afterEvaluate {
                         '**/*$*$*.*'
                 ]
 
-                project.logger.lifecycle(sourceName)
-
                 def javaDebugTree = fileTree(dir: "${buildDir}/intermediates/javac/${sourceName}", excludes: fileFilter)
 
                 def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${sourceName}", excludes: fileFilter)
