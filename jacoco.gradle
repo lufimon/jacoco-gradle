@@ -11,85 +11,56 @@ android {
 }
 
 project.afterEvaluate {
-    //Gather build type and product flavor names in a list
-    def buildTypes = android.buildTypes.collect { type -> type.name }
-    def productFlavors = android.productFlavors.collect { flavor -> flavor.name }
-    if (!productFlavors) productFlavors.add('')
-
-    productFlavors.each { productFlavorName ->
-        buildTypes.each { buildTypeName ->
-
-            //Define the sourceName and the sourcePath.
-            def sourceName, sourcePath
-            if (!productFlavorName) {
-                sourceName = sourcePath = "${buildTypeName}"
-            } else {
-                sourceName = "${productFlavorName}${buildTypeName.capitalize()}"
-                sourcePath = "${productFlavorName}/${buildTypeName}"
-            }
-
-            def testTaskName = "test${sourceName.capitalize()}UnitTest"
-
-            //noinspection GroovyAssignabilityCheck
-            task "create${sourceName.capitalize()}UnitTestCoverageReport"(type: JacocoReport, dependsOn: "$testTaskName") {
-
-                reports {
-                    xml.enabled = true
-                    html.enabled = true
-                    xml.destination = file("${buildDir}/reports/jacoco/jacocoTestReport.xml")
-                    html.destination = file("${buildDir}/reports/jacoco")
-                }
-
-                group = "Reporting"
-                description = "Generate Jacoco coverage reports on the ${sourceName.capitalize()} build."
-
-                def fileFilter = [
-                        '**/*Test*.*',
-                        '**/AutoValue_*.*',
-                        '**/*JavascriptBridge.class',
-                        '**/R.class',
-                        '**/R$*.class',
-                        '**/Manifest*.*',
-                        'android/**/*.*',
-                        '**/BuildConfig.*',
-                        '**/*$ViewBinder*.*',
-                        '**/*$ViewInjector*.*',
-                        '**/Lambda$*.class',
-                        '**/Lambda.class',
-                        '**/*Lambda.class',
-                        '**/*Lambda*.class',
-                        '**/*$InjectAdapter.class',
-                        '**/*$ModuleAdapter.class',
-                        '**/*$ViewInjector*.class',
-                        '**/*_MembersInjector.class',
-                        '*/*_MembersInjector*.*',
-                        '**/*_*Factory*.*',
-                        '*/*Component*.*',
-                        '**/*Module*.*',
-                        '**/*_Provide*Factory*.*',
-                        '**/*Dagger*.*',
-                        '**/*$*$*.*'
-                ]
-
-                def javaDebugTree = fileTree(dir: "${buildDir}/intermediates/javac/${sourceName}", excludes: fileFilter)
-
-                def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${sourceName}", excludes: fileFilter)
-
-                def mainSrc = [
-                        "${project.projectDir}/src/main/java",
-                        "${project.projectDir}/src/$productFlavorName/java",
-                        "${project.projectDir}/src/$buildTypeName/java"
-                ]
-
-                //Directory where the compiled class files are
-
-                sourceDirectories = files(mainSrc)
-                classDirectories = files([javaDebugTree, kotlinDebugTree])
-                executionData = fileTree(dir: "$buildDir", includes: [
-                        "jacoco/${testTaskName}.exec",
-                        "outputs/code-coverage/connected/*coverage.ec"
-                ])
-            }
+    task "createUnitTestCoverageReport"(type: JacocoReport, dependsOn: "testUatDebugUnitTest") {
+        reports {
+            xml.enabled = true
+            html.enabled = true
+            xml.destination = file("${buildDir}/reports/jacoco/jacocoTestReport.xml")
+            html.destination = file("${buildDir}/reports/jacoco")
         }
+
+        group = "Reporting"
+        description = "Generate Jacoco coverage reports on the UatDebug build."
+
+        def fileFilter = [
+                '**/*Test*.*',
+                '**/AutoValue_*.*',
+                '**/*JavascriptBridge.class',
+                '**/R.class',
+                '**/R$*.class',
+                '**/Manifest*.*',
+                'android/**/*.*',
+                '**/BuildConfig.*',
+                '**/*$ViewBinder*.*',
+                '**/*$ViewInjector*.*',
+                '**/Lambda$*.class',
+                '**/Lambda.class',
+                '**/*Lambda.class',
+                '**/*Lambda*.class',
+                '**/*$InjectAdapter.class',
+                '**/*$ModuleAdapter.class',
+                '**/*$ViewInjector*.class',
+                '**/*_MembersInjector.class',
+                '*/*_MembersInjector*.*',
+                '**/*_*Factory*.*',
+                '*/*Component*.*',
+                '**/*Module*.*',
+                '**/*_Provide*Factory*.*',
+                '**/*Dagger*.*',
+                '**/*$*$*.*'
+        ]
+
+        def javaDebugTree = fileTree(dir: "${buildDir}/intermediates/javac/uatDebug", excludes: fileFilter)
+
+        def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/uatDebug", excludes: fileFilter)
+
+        def mainSrc = "${project.projectDir}/src/main/java"
+
+        sourceDirectories = files([mainSrc])
+        classDirectories = files([javaDebugTree, kotlinDebugTree])
+        executionData = fileTree(dir: "$buildDir", includes: [
+                "jacoco/testUatDebugUnitTest.exec",
+                "outputs/code-coverage/connected/*coverage.ec"
+        ])
     }
 }
