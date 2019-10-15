@@ -75,7 +75,11 @@ project.afterEvaluate {
 
                 def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${sourceName}", excludes: fileFilter)
 
-                def mainSrc = ["src/main/java"]
+                def mainSrc = [
+                        "${project.projectDir}/src/main/java",
+                        "${project.projectDir}/src/$productFlavorName/java",
+                        "${project.projectDir}/src/$buildTypeName/java"
+                ]
 
                 //Directory where the compiled class files are
 
