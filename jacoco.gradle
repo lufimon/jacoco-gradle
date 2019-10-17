@@ -10,7 +10,7 @@ android {
 }
 
 project.afterEvaluate {
-    task "createUnitTestCoverageReport"(type: JacocoReport, dependsOn: ["testUatDebugUnitTest", "createUatDebugCoverageReport"]) {
+    task "createUnitTestCoverageReport"(type: JacocoReport, dependsOn: ["testUatDebugUnitTest"]) {
         reports {
             xml.enabled = true
             html.enabled = true
@@ -53,12 +53,10 @@ project.afterEvaluate {
 
         def kotlinDebugUnitTree = fileTree(dir: "${project.buildDir}/tmp/kotlin-classes/uatDebugUnitTest", excludes: fileFilter)
 
-        def kotlinDebugAndroidTree = fileTree(dir: "${project.buildDir}/tmp/kotlin-classes/uatDebugAndroidTest", excludes: fileFilter)
-
         def mainSrc = "${project.projectDir}/src/main/java"
 
         sourceDirectories.from = files([mainSrc])
-        classDirectories.from = files([kotlinDebugTree, kotlinDebugUnitTree, kotlinDebugAndroidTree])
+        classDirectories.from = files([kotlinDebugTree, kotlinDebugUnitTree])
         executionData.from = fileTree(dir: "$buildDir", includes: [
                 "jacoco/testUatDebugUnitTest.exec",
                 "outputs/code-coverage/connected/*coverage.ec"
